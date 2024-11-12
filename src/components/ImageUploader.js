@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { create as ipfsHttpClient } from 'ipfs-http-client';
 
+
 const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0');
 
 const ImageUploader = () => {
   const [image, setImage] = useState(null);
-  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [ipfsHash, setIpfsHash] = useState(null);
 
   const handleImageChange = async (event) => {
@@ -17,16 +18,30 @@ const ImageUploader = () => {
   };
 
   const uploadToIpfs = async (file) => {
-    try {
-      setUploading(true);
-      const added = await client.add(file);
-      setIpfsHash(`https://ipfs.infura.io/ipfs/${added.path}`);
-    } catch (error) {
-      console.error('Error uploading file: ', error);
-    } finally {
-      setUploading(false);
-    }
-  };
+  try {
+    setUploading(true);
+    setUploadProgress(0);
+
+    // Simulated upload progress for UX (replace with actual progress if available)
+    const interval = setInterval(() => {
+      setUploadProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          return 100;
+        }
+        return prev + 20;
+      });
+    }, 500);
+
+    const added = await client.add(file);
+    setIpfsHash(`https://ipfs.infura.io/ipfs/${added.path}`);
+  } catch (error) {
+    console.error('Error uploading file: ', error);
+  } finally {
+    setUploading(false);
+  }
+};
+
 
   return (
     <div className="text-center">
@@ -46,14 +61,13 @@ const ImageUploader = () => {
       </div>
 
       {uploading && (
-  <div className="text-blue-600 text-lg font-semibold">
-    <svg className="animate-spin h-5 w-5 mr-2 inline-block text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-    </svg>
-    Uploading...
+  <div className="relative pt-2">
+    <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200">
+      <div style={{ width: `${uploadProgress}%` }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-600 transition-all duration-300"></div>
+    </div>
   </div>
 )}
+
 
       
       {image && !uploading && (
