@@ -57,16 +57,17 @@ const ImageUploader = () => {
   return (
     <div className="text-center">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Capture the Moment!</h2>
-      
+
       <div className="mb-4">
         <label className="cursor-pointer inline-flex items-center bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-blue-700 transition-transform transform hover:scale-105 duration-200">
           <input 
             type="file" 
             accept="image/*" 
+            capture="environment" 
             onChange={handleImageChange} 
             className="hidden"
           />
-          Select or Capture Photo
+          Capture Photo
         </label>
       </div>
 
@@ -108,9 +109,10 @@ const ImageUploader = () => {
         </div>
       )}
 
+      {/* Camera button positioned in the lower-middle of the screen */}
       <button
         onClick={() => document.querySelector('input[type=file]').click()}
-        className="fixed bottom-8 right-8 bg-blue-600 text-white rounded-full p-4 shadow-lg hover:bg-blue-700 transition-transform transform hover:scale-105 duration-300"
+        className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white rounded-full p-4 shadow-lg hover:bg-blue-700 transition-transform transform hover:scale-105 duration-300"
       >
         📸
       </button>
