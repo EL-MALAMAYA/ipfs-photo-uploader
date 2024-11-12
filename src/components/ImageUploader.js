@@ -1,7 +1,4 @@
 import React, { useState } from 'react';
-import { create as ipfsHttpClient } from 'ipfs-http-client';
-
-const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0');
 
 const ImageUploader = () => {
   const [image, setImage] = useState(null);
@@ -14,19 +11,24 @@ const ImageUploader = () => {
   const handleImageChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
+      console.log("File selected:", file);
       setImage(URL.createObjectURL(file));
       setErrorMessage(null); // Clear any previous errors
-      await uploadToIpfs(file);
+      await uploadToPinata(file);
     }
   };
 
-  const uploadToIpfs = async (file, retries = 3) => {
+  const uploadToPinata = async (file, retries = 3) => {
+    const apiKey = '549f55bf4068aae1e2c6';
+    const apiSecret = '4cdcdeddf69d095a13fb94080cb7a2f6a04e91b7202214779aa56a7b253cd088';
+
     try {
+      console.log("Starting upload...");
       setUploading(true);
       setUploadProgress(0);
-      setErrorMessage(null); // Clear any previous errors
+      setErrorMessage(null);
 
-      // Simulated upload progress for UX
+      // Simulate upload progress for UX
       const interval = setInterval(() => {
         setUploadProgress((prev) => {
           if (prev >= 100) {
@@ -37,16 +39,35 @@ const ImageUploader = () => {
         });
       }, 500);
 
-      const added = await client.add(file);
-      setIpfsHash(`https://ipfs.infura.io/ipfs/${added.path}`);
-      setShowModal(true); // Show modal on successful upload
-    } catch (error) {
-      if (retries > 0) {
-        console.log('Retrying upload...');
-        uploadToIpfs(file, retries - 1);
+      // Prepare the file for upload
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // Upload to Pinata
+      console.log("Uploading file to Pinata...");
+      const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${btoa(`${apiKey}:${apiSecret}`)}`,
+        },
+        body: formData,
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        console.log("File uploaded to IPFS:", result.IpfsHash);
+        setIpfsHash(`https://gateway.pinata.cloud/ipfs/${result.IpfsHash}`);
+        setShowModal(true); // Show modal on successful upload
       } else {
-        console.error('Error uploading file: ', error);
-        setErrorMessage('There was an error uploading your image. Please try again.');
+        throw new Error(result.error || 'Failed to upload to IPFS');
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      if (retries > 0) {
+        console.log("Retrying upload...");
+        uploadToPinata(file, retries - 1);
+      } else {
+        setErrorMessage("There was an error uploading your image. Please try again.");
       }
     } finally {
       setUploading(false);
