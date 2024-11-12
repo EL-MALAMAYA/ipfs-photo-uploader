@@ -8,6 +8,7 @@ const ImageUploader = () => {
   const [showModal, setShowModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
 
+  // Handle the file selection and preview
   const handleImageChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -18,9 +19,10 @@ const ImageUploader = () => {
     }
   };
 
+  // Function to upload image to Pinata with error handling and progress tracking
   const uploadToPinata = async (file, retries = 3) => {
-    const apiKey = '549f55bf4068aae1e2c6';
-    const apiSecret = '4cdcdeddf69d095a13fb94080cb7a2f6a04e91b7202214779aa56a7b253cd088';
+    const apiKey = '549f55bf4068aae1e2c6'; // Replace with your actual API key
+    const apiSecret = '4cdcdeddf69d095a13fb94080cb7a2f6a04e91b7202214779aa56a7b253cd088'; // Replace with your actual API secret
 
     try {
       console.log("Starting upload...");
@@ -28,7 +30,7 @@ const ImageUploader = () => {
       setUploadProgress(0);
       setErrorMessage(null);
 
-      // Simulate upload progress for UX
+      // Simulated upload progress for UX
       const interval = setInterval(() => {
         setUploadProgress((prev) => {
           if (prev >= 100) {
@@ -43,8 +45,10 @@ const ImageUploader = () => {
       const formData = new FormData();
       formData.append('file', file);
 
-      // Upload to Pinata
+      // Log the attempt to upload to Pinata
       console.log("Uploading file to Pinata...");
+
+      // Upload to Pinata using fetch
       const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
         method: 'POST',
         headers: {
@@ -54,6 +58,8 @@ const ImageUploader = () => {
       });
 
       const result = await response.json();
+
+      // Check if the response is successful
       if (response.ok) {
         console.log("File uploaded to IPFS:", result.IpfsHash);
         setIpfsHash(`https://gateway.pinata.cloud/ipfs/${result.IpfsHash}`);
@@ -63,6 +69,8 @@ const ImageUploader = () => {
       }
     } catch (error) {
       console.error("Error uploading file:", error);
+
+      // Retry mechanism
       if (retries > 0) {
         console.log("Retrying upload...");
         uploadToPinata(file, retries - 1);
