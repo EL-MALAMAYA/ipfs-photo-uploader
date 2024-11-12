@@ -29,27 +29,43 @@ const ImageUploader = () => {
   };
 
   return (
-    <div className="w-full max-w-md p-4 bg-white shadow-md rounded-md">
-      <h2 className="text-lg font-bold mb-4 text-center">Upload Image to IPFS</h2>
+    <div className="text-center">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Upload Image to IPFS</h2>
+      
       <div className="mb-4">
-        <input 
-          type="file" 
-          accept="image/*" 
-          capture="environment" 
-          onChange={handleImageChange} 
-          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-        />
+        <label className="cursor-pointer inline-flex items-center bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-blue-700 transition-all duration-300">
+          <input 
+            type="file" 
+            accept="image/*" 
+            capture="environment" 
+            onChange={handleImageChange} 
+            className="hidden"
+          />
+          Select or Capture Photo
+        </label>
       </div>
+
       {uploading && (
-        <div className="text-center text-blue-500">Uploading...</div>
-      )}
+  <div className="text-blue-600 text-lg font-semibold">
+    <svg className="animate-spin h-5 w-5 mr-2 inline-block text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+    </svg>
+    Uploading...
+  </div>
+)}
+
+      
       {image && !uploading && (
-        <img src={image} alt="Preview" className="w-full h-48 object-cover rounded-md mb-4" />
+        <div className="mt-4">
+          <img src={image} alt="Preview" className="w-full h-48 object-cover rounded-lg shadow-md mb-4" />
+        </div>
       )}
+
       {ipfsHash && (
-        <div className="mt-4 text-center">
+        <div className="mt-6">
           <p className="text-gray-700">Image uploaded to IPFS:</p>
-          <a href={ipfsHash} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+          <a href={ipfsHash} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline hover:text-blue-700">
             {ipfsHash}
           </a>
         </div>
