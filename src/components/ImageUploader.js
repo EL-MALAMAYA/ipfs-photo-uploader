@@ -46,7 +46,7 @@ const ImageUploader = () => {
 
   return (
     <div className="text-center">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Upload Image to IPFS</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Capture the Moment!</h2>
       
       <div className="mb-4">
         <label className="cursor-pointer inline-flex items-center bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-blue-700 transition-transform transform hover:scale-105 duration-200">
