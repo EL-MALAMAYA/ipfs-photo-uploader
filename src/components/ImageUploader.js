@@ -9,11 +9,13 @@ const ImageUploader = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [ipfsHash, setIpfsHash] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const handleImageChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
       setImage(URL.createObjectURL(file));
+      setErrorMessage(null); // Clear any previous errors
       await uploadToIpfs(file);
     }
   };
@@ -22,8 +24,9 @@ const ImageUploader = () => {
     try {
       setUploading(true);
       setUploadProgress(0);
+      setErrorMessage(null); // Clear any previous errors
 
-      // Simulated upload progress for UX (replace with actual progress if available)
+      // Simulated upload progress for UX
       const interval = setInterval(() => {
         setUploadProgress((prev) => {
           if (prev >= 100) {
@@ -39,8 +42,10 @@ const ImageUploader = () => {
       setShowModal(true); // Show modal on successful upload
     } catch (error) {
       console.error('Error uploading file: ', error);
+      setErrorMessage('There was an error uploading your image. Please try again.');
     } finally {
       setUploading(false);
+      setUploadProgress(0); // Reset progress after upload completes or fails
     }
   };
 
@@ -72,6 +77,12 @@ const ImageUploader = () => {
       {image && !uploading && (
         <div className="mt-4 animate-fadeIn">
           <img src={image} alt="Preview" className="w-full h-48 object-cover rounded-lg shadow-md mb-4" />
+        </div>
+      )}
+
+      {errorMessage && (
+        <div className="text-red-500 mt-4">
+          {errorMessage}
         </div>
       )}
 
