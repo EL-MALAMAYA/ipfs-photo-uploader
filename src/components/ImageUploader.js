@@ -20,7 +20,7 @@ const ImageUploader = () => {
     }
   };
 
-  const uploadToIpfs = async (file) => {
+  const uploadToIpfs = async (file, retries = 3) => {
     try {
       setUploading(true);
       setUploadProgress(0);
@@ -41,8 +41,13 @@ const ImageUploader = () => {
       setIpfsHash(`https://ipfs.infura.io/ipfs/${added.path}`);
       setShowModal(true); // Show modal on successful upload
     } catch (error) {
-      console.error('Error uploading file: ', error);
-      setErrorMessage('There was an error uploading your image. Please try again.');
+      if (retries > 0) {
+        console.log('Retrying upload...');
+        uploadToIpfs(file, retries - 1);
+      } else {
+        console.error('Error uploading file: ', error);
+        setErrorMessage('There was an error uploading your image. Please try again.');
+      }
     } finally {
       setUploading(false);
       setUploadProgress(0); // Reset progress after upload completes or fails
@@ -58,7 +63,6 @@ const ImageUploader = () => {
           <input 
             type="file" 
             accept="image/*" 
-            capture="environment" 
             onChange={handleImageChange} 
             className="hidden"
           />
@@ -76,7 +80,7 @@ const ImageUploader = () => {
 
       {image && !uploading && (
         <div className="mt-4 animate-fadeIn">
-          <img src={image} alt="Preview" className="w-full h-48 object-cover rounded-lg shadow-md mb-4" />
+          <img src={image} alt="Preview" className="w-full sm:h-48 h-32 object-cover rounded-lg shadow-md mb-4" />
         </div>
       )}
 
@@ -88,7 +92,7 @@ const ImageUploader = () => {
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full text-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full text-center">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Image Uploaded Successfully!</h3>
             <p className="text-gray-700 mb-4">Here’s your IPFS link:</p>
             <a href={ipfsHash} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline break-all hover:text-blue-700">
